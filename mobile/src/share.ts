@@ -24,10 +24,30 @@ function downloadOnWeb(dataUri: string) {
   a.click();
 }
 
+/** Trên trình duyệt điện thoại: mở bảng chia sẻ của máy nếu trình duyệt hỗ trợ gửi ảnh. */
+async function shareOnWeb(dataUri: string): Promise<boolean> {
+  const nav = typeof navigator !== "undefined" ? navigator : undefined;
+  if (!nav?.share || !nav.canShare) return false;
+  const blob = await (await fetch(dataUri)).blob();
+  const file = new File([blob], "thiep-tet.png", { type: "image/png" });
+  if (!nav.canShare({ files: [file] })) return false;
+  try {
+    await nav.share({ files: [file], title: "Thiệp Tết" });
+  } catch (e) {
+    // Người dùng đóng bảng chia sẻ thì thôi, không coi là lỗi.
+    if (e instanceof Error && e.name === "AbortError") return true;
+    throw e;
+  }
+  return true;
+}
+
 /** Mở bảng chia sẻ của máy: Zalo, Messenger, Facebook, Instagram... */
 export async function shareCard(ref: RefObject<CardHandle | null>): Promise<void> {
   const uri = await capture(ref);
-  if (Platform.OS === "web") return downloadOnWeb(uri);
+  if (Platform.OS === "web") {
+    if (!(await shareOnWeb(uri))) downloadOnWeb(uri);
+    return;
+  }
   if (!(await Sharing.isAvailableAsync())) throw new Error("Máy không hỗ trợ chia sẻ");
   await Sharing.shareAsync(uri, { mimeType: "image/png", dialogTitle: "Gửi thiệp Tết", UTI: "public.png" });
 }

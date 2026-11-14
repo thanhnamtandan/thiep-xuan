@@ -35,6 +35,14 @@
           "savePhotosPermission": "Cho phép lưu thiệp Tết vào thư viện ảnh.",
           "isAccessMediaLocationEnabled": false
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cho phép chọn ảnh gia đình để ghép vào thiệp Tết.",
+          "cameraPermission": "Cho phép chụp ảnh để ghép vào thiệp Tết.",
+          "microphonePermission": false
+        }
       ]
     ],
     "scheme": "thiepxuan"

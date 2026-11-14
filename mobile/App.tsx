@@ -9,6 +9,7 @@ import { BeVietnamPro_500Medium } from "@expo-google-fonts/be-vietnam-pro/500Med
 import { BeVietnamPro_600SemiBold } from "@expo-google-fonts/be-vietnam-pro/600SemiBold";
 import { BeVietnamPro_700Bold } from "@expo-google-fonts/be-vietnam-pro/700Bold";
 import { fetchGreetings } from "./src/api";
+import type { CardPhoto } from "./src/components/PhotoFrame";
 import { C } from "./src/components/ui";
 import type { GreetingForm, GreetingResponse } from "./src/data";
 import { CardScreen } from "./src/screens/CardScreen";
@@ -28,12 +29,15 @@ export default function App() {
   const [form, setForm] = useState<GreetingForm>({ occasion: "tet", recipient: "bo-me", tone: "am-ap" });
   const [step, setStep] = useState<Step>({ name: "form" });
   const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState<CardPhoto | null>(null);
 
-  const generate = async (f: GreetingForm) => {
+  const generate = async (f: GreetingForm, again = false) => {
     setForm(f);
     setLoading(true);
+    // "Viết lại": nhắc AI viết khác, nhưng không lưu câu nhắc này vào form.
+    const req = again ? { ...f, note: f.note ? `${f.note} (viết khác lần trước)` : "Viết khác lần trước" } : f;
     try {
-      setStep({ name: "pick", data: await fetchGreetings(f) });
+      setStep({ name: "pick", data: await fetchGreetings(req, again) });
     } finally {
       setLoading(false);
     }
@@ -50,19 +54,19 @@ export default function App() {
   return (
     <SafeAreaView style={s.root}>
       <StatusBar style="dark" />
-      {step.name === "form" && <FormScreen initial={form} loading={loading} onSubmit={generate} />}
+      {step.name === "form" && <FormScreen initial={form} loading={loading} onSubmit={(f) => generate(f)} />}
       {step.name === "pick" && (
         <PickScreen
           key={step.data.greetings.join("|")}
           data={step.data}
           loading={loading}
           onBack={() => setStep({ name: "form" })}
-          onRegenerate={() => generate({ ...form, note: form.note ? `${form.note} (viết khác lần trước)` : "Viết khác lần trước" })}
+          onRegenerate={() => generate(form, true)}
           onChoose={(greeting) => setStep({ name: "card", data: step.data, greeting })}
         />
       )}
       {step.name === "card" && (
-        <CardScreen greeting={step.greeting} couplet={step.data.couplet} onBack={() => setStep({ name: "pick", data: step.data })} />
+        <CardScreen greeting={step.greeting} couplet={step.data.couplet} photo={photo} onPhotoChange={setPhoto} onBack={() => setStep({ name: "pick", data: step.data })} />
       )}
     </SafeAreaView>
   );

@@ -50,19 +50,3 @@ export type GreetingForm = {
   senderName?: string;
   note?: string;
 };
-
-// Dùng khi máy không có mạng hoặc máy chủ không trả lời.
-export const OFFLINE_RESPONSE: GreetingResponse = {
-  greetings: [
-    "Chúc mừng năm mới Đinh Mùi! Chúc bạn và gia đình an khang thịnh vượng, vạn sự như ý.",
-    "Năm mới vạn sự hanh thông, sức khỏe dồi dào, tiền vào như nước, niềm vui ngập tràn.",
-    "Xuân sang phú quý, Tết đến bình an. Chúc một năm thật nhiều may mắn và hạnh phúc.",
-  ],
-  couplet: {
-    left: "Tam dương khai thái xuân như ý",
-    right: "Ngũ phúc lâm môn Tết an khang",
-    banner: "Tam Dương Khai Thái",
-  },
-  source: "offline",
-  remaining: null,
-};

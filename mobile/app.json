@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Thiệp Xuân",
+    "slug": "thiep-xuan",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "vn.thiepxuan.app",
+      "infoPlist": {
+        "NSPhotoLibraryAddUsageDescription": "Cho phép lưu thiệp Tết vào thư viện ảnh."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#B3141D",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "vn.thiepxuan.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sharing",
+      "expo-font",
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Cho phép lưu thiệp Tết vào thư viện ảnh.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ]
+    ],
+    "scheme": "thiepxuan"
+  }
+}

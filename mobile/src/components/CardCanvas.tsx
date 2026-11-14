@@ -2,6 +2,7 @@ import type { ComponentRef, Ref } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Defs, G, Line, LinearGradient, Path, Rect, Stop } from "react-native-svg";
 import type { Couplet } from "../data";
+import { PhotoFrame, type CardPhoto } from "./PhotoFrame";
 
 export type TemplateId = "mai" | "dao" | "denlong" | "caudoi";
 
@@ -23,13 +24,21 @@ type Props = {
   greeting: string;
   couplet: Couplet;
   watermark: boolean;
+  photo?: CardPhoto | null;
+  onPhotoChange?: (p: CardPhoto) => void;
+  onPhotoDragging?: (dragging: boolean) => void;
 };
+
+/** Vị trí khung ảnh trên từng mẫu, đơn vị khung 400 x 500. */
+export function photoSlot(template: TemplateId) {
+  return template === "caudoi" ? { x: 110, y: 134, w: 180, h: 135 } : { x: 90, y: 102, w: 220, h: 165 };
+}
 
 // Thiệp vẽ trên khung 400 x 500 rồi co giãn theo chiều rộng màn hình.
 const VB_W = 400;
 const VB_H = 500;
 
-export function CardCanvas({ ref, template, width, greeting, couplet, watermark }: Props) {
+export function CardCanvas({ ref, template, width, greeting, couplet, watermark, photo, onPhotoChange, onPhotoDragging }: Props) {
   const height = (width * VB_H) / VB_W;
   const k = width / VB_W;
   const theme = THEMES[template];
@@ -37,11 +46,36 @@ export function CardCanvas({ ref, template, width, greeting, couplet, watermark 
   return (
     <View ref={ref} collapsable={false} style={{ width, height, overflow: "hidden", backgroundColor: theme.bg }}>
       <Svg width={width} height={height} viewBox={`0 0 ${VB_W} ${VB_H}`} style={StyleSheet.absoluteFill}>
-        <Background template={template} />
+        <Background template={template} compact={Boolean(photo)} />
       </Svg>
 
       {template === "caudoi" ? (
-        <CoupletLayout k={k} couplet={couplet} greeting={greeting} />
+        <CoupletLayout k={k} couplet={couplet} greeting={greeting} photo={photo} onPhotoChange={onPhotoChange} onPhotoDragging={onPhotoDragging} />
+      ) : photo ? (
+        <>
+          <View style={[StyleSheet.absoluteFill, { paddingHorizontal: 44 * k, paddingTop: 50 * k, alignItems: "center" }]}>
+            <Text style={{ fontFamily: "DancingScript_700Bold", fontSize: 34 * k, color: theme.title, textAlign: "center", lineHeight: 42 * k }}>
+              Chúc Mừng Năm Mới
+            </Text>
+            <View style={{ height: (photoSlot(template).h + 18) * k }} />
+            <Text style={{ fontFamily: "BeVietnamPro_600SemiBold", fontSize: 11 * k, letterSpacing: 3 * k, color: theme.accent }}>
+              {YEAR_LINE.toUpperCase()}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "BeVietnamPro_500Medium",
+                fontSize: fitSize(greeting, k) * 0.8,
+                lineHeight: fitSize(greeting, k) * 0.8 * 1.45,
+                color: theme.body,
+                textAlign: "center",
+                marginTop: 10 * k,
+              }}
+            >
+              {greeting}
+            </Text>
+          </View>
+          <PhotoFrame photo={photo} k={k} {...photoSlot(template)} border={theme.accent} onChange={onPhotoChange} onDragging={onPhotoDragging} />
+        </>
       ) : (
         <View style={[StyleSheet.absoluteFill, { paddingHorizontal: 44 * k, paddingTop: 92 * k, alignItems: "center" }]}>
           <Text style={{ fontFamily: "DancingScript_700Bold", fontSize: 42 * k, color: theme.title, textAlign: "center", lineHeight: 50 * k }}>
@@ -87,7 +121,9 @@ const THEMES: Record<TemplateId, { bg: string; title: string; accent: string; bo
   caudoi: { bg: "#F7EBD3", title: "#FFD66B", accent: "#A3121B", body: "#4A1A12", watermark: "rgba(74,26,18,0.45)" },
 };
 
-function Background({ template }: { template: TemplateId }) {
+// compact: cành hoa nhỏ lại để chừa chỗ cho khung ảnh và tiêu đề.
+function Background({ template, compact }: { template: TemplateId; compact: boolean }) {
+  const bs = compact ? 0.6 : 1;
   switch (template) {
     case "mai":
       return (
@@ -100,7 +136,7 @@ function Background({ template }: { template: TemplateId }) {
           </Defs>
           <Rect width={VB_W} height={VB_H} fill="url(#g)" />
           <Frame color="#F6C453" />
-          <Branch x={0} y={0} flip={false} petal="#FFD23F" center="#C77700" />
+          <Branch x={0} y={0} flip={false} petal="#FFD23F" center="#C77700" scale={bs} />
           <Branch x={VB_W} y={VB_H} flip petal="#FFD23F" center="#C77700" />
         </>
       );
@@ -109,7 +145,7 @@ function Background({ template }: { template: TemplateId }) {
         <>
           <Rect width={VB_W} height={VB_H} fill="#FFF6EC" />
           <Frame color="#E7A1A8" />
-          <Branch x={VB_W} y={0} flip={false} mirror petal="#F48FB1" center="#AD1457" />
+          <Branch x={VB_W} y={0} flip={false} mirror petal="#F48FB1" center="#AD1457" scale={bs} />
           <Branch x={0} y={VB_H} flip mirror petal="#F8BBD0" center="#C2185B" />
         </>
       );
@@ -228,7 +264,22 @@ function Lantern({ x, len, small = false }: { x: number; len: number; small?: bo
   );
 }
 
-function CoupletLayout({ k, couplet, greeting }: { k: number; couplet: Couplet; greeting: string }) {
+function CoupletLayout({
+  k,
+  couplet,
+  greeting,
+  photo,
+  onPhotoChange,
+  onPhotoDragging,
+}: {
+  k: number;
+  couplet: Couplet;
+  greeting: string;
+  photo?: CardPhoto | null;
+  onPhotoChange?: (p: CardPhoto) => void;
+  onPhotoDragging?: (dragging: boolean) => void;
+}) {
+  const bodySize = Math.min(15, fitSize(greeting, 1) * (photo ? 0.72 : 0.85));
   const col = (text: string, left: number) => (
     <View style={{ position: "absolute", left: left * k, top: 104 * k, width: 64 * k, height: 362 * k, alignItems: "center", justifyContent: "space-evenly" }}>
       {text.split(/\s+/).filter(Boolean).slice(0, 9).map((w, i) => (
@@ -249,16 +300,18 @@ function CoupletLayout({ k, couplet, greeting }: { k: number; couplet: Couplet; 
       {col(couplet.left, 314)}
       {col(couplet.right, 22)}
       <View style={{ position: "absolute", left: 100 * k, width: 200 * k, top: 100 * k, alignItems: "center" }}>
-        <Text style={{ fontFamily: "DancingScript_700Bold", fontSize: 34 * k, color: "#A3121B", textAlign: "center", lineHeight: 40 * k }}>
-          Chúc Mừng{"\n"}Năm Mới
+        <Text style={{ fontFamily: "DancingScript_700Bold", fontSize: (photo ? 24 : 34) * k, color: "#A3121B", textAlign: "center", lineHeight: (photo ? 30 : 40) * k }}>
+          {photo ? "Chúc Mừng Năm Mới" : "Chúc Mừng\nNăm Mới"}
         </Text>
+        {photo ? <View style={{ height: 144 * k }} /> : null}
         <Text style={{ fontFamily: "BeVietnamPro_600SemiBold", fontSize: 10 * k, letterSpacing: 2 * k, color: "#A3121B", marginTop: 4 * k }}>
           {YEAR_LINE.toUpperCase()}
         </Text>
-        <Text style={{ fontFamily: "BeVietnamPro_500Medium", fontSize: Math.min(15, fitSize(greeting, 1) * 0.85) * k, lineHeight: Math.min(15, fitSize(greeting, 1) * 0.85) * 1.5 * k, color: "#4A1A12", textAlign: "center", marginTop: 14 * k }}>
+        <Text style={{ fontFamily: "BeVietnamPro_500Medium", fontSize: bodySize * k, lineHeight: bodySize * 1.5 * k, color: "#4A1A12", textAlign: "center", marginTop: (photo ? 8 : 14) * k }}>
           {greeting}
         </Text>
       </View>
+      {photo ? <PhotoFrame photo={photo} k={k} {...photoSlot("caudoi")} border="#B3141D" onChange={onPhotoChange} onDragging={onPhotoDragging} /> : null}
     </View>
   );
 }

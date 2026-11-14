@@ -2,7 +2,7 @@
 
 App tạo lời chúc và thiệp Tết bằng AI cho người Việt. Bản MVP cho Tết Đinh Mùi (mùng 1 Tết: thứ Bảy 6/2/2027).
 
-Người dùng chọn người nhận (ông bà, bố mẹ, sếp, khách hàng...), giọng điệu (ấm áp, trang trọng, hài hước, có vần), có thể thêm tên và một ghi chú. AI viết 4 lời chúc và 1 câu đối. Người dùng sửa lại, chọn 1 trong 4 mẫu thiệp (Mai vàng, Đào hồng, Đèn lồng, Câu đối), rồi gửi qua Zalo, Messenger, Facebook bằng bảng chia sẻ của máy hoặc lưu ảnh 1080 x 1350 vào máy.
+Người dùng chọn người nhận (ông bà, bố mẹ, sếp, khách hàng...), giọng điệu (ấm áp, trang trọng, hài hước, có vần), có thể thêm tên và một ghi chú. AI viết 4 lời chúc và 1 câu đối. Người dùng sửa lại, chọn 1 trong 4 mẫu thiệp (Mai vàng, Đào hồng, Đèn lồng, Câu đối), có thể ghép ảnh gia đình vào khung ảnh trên thiệp (kéo để căn, phóng to thu nhỏ), rồi gửi qua Zalo, Messenger, Facebook bằng bảng chia sẻ của máy hoặc lưu ảnh 1080 x 1350 vào máy.
 
 ## Cấu trúc
 
@@ -48,6 +48,5 @@ Lượt và bộ đệm hiện nằm trong bộ nhớ tiến trình, đủ cho 1
 ## Việc tiếp theo
 
 1. Thanh toán gói Tết (29k đến 49k): bỏ watermark, ảnh độ phân giải cao, mẫu cao cấp. Cổng PayOS hoặc SePay để tự xác nhận chuyển khoản.
-2. Ghép ảnh gia đình vào thiệp.
-3. Gói doanh nghiệp: logo, điền tên khách hàng hàng loạt, gửi qua Zalo OA.
-4. Thêm dịp khác: 8/3, 20/10, sinh nhật, khai trương (máy chủ đã có sẵn tham số `occasion`).
+2. Gói doanh nghiệp: logo, điền tên khách hàng hàng loạt, gửi qua Zalo OA.
+3. Thêm dịp khác: 8/3, 20/10, sinh nhật, khai trương (máy chủ đã có sẵn tham số `occasion`).

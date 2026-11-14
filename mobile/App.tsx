@@ -9,6 +9,7 @@ import { BeVietnamPro_500Medium } from "@expo-google-fonts/be-vietnam-pro/500Med
 import { BeVietnamPro_600SemiBold } from "@expo-google-fonts/be-vietnam-pro/600SemiBold";
 import { BeVietnamPro_700Bold } from "@expo-google-fonts/be-vietnam-pro/700Bold";
 import { fetchGreetings } from "./src/api";
+import type { CardPhoto } from "./src/components/PhotoFrame";
 import { C } from "./src/components/ui";
 import type { GreetingForm, GreetingResponse } from "./src/data";
 import { CardScreen } from "./src/screens/CardScreen";
@@ -28,6 +29,7 @@ export default function App() {
   const [form, setForm] = useState<GreetingForm>({ occasion: "tet", recipient: "bo-me", tone: "am-ap" });
   const [step, setStep] = useState<Step>({ name: "form" });
   const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState<CardPhoto | null>(null);
 
   const generate = async (f: GreetingForm) => {
     setForm(f);
@@ -62,7 +64,7 @@ export default function App() {
         />
       )}
       {step.name === "card" && (
-        <CardScreen greeting={step.greeting} couplet={step.data.couplet} onBack={() => setStep({ name: "pick", data: step.data })} />
+        <CardScreen greeting={step.greeting} couplet={step.data.couplet} photo={photo} onPhotoChange={setPhoto} onBack={() => setStep({ name: "pick", data: step.data })} />
       )}
     </SafeAreaView>
   );

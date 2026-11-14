@@ -4,6 +4,10 @@ App tạo lời chúc và thiệp Tết bằng AI cho người Việt. Bản MVP
 
 Người dùng chọn người nhận (ông bà, bố mẹ, sếp, khách hàng...), giọng điệu (ấm áp, trang trọng, hài hước, có vần), có thể thêm tên và một ghi chú. AI viết 4 lời chúc và 1 câu đối. Người dùng sửa lại, chọn 1 trong 4 mẫu thiệp (Mai vàng, Đào hồng, Đèn lồng, Câu đối), có thể ghép ảnh gia đình vào khung ảnh trên thiệp (kéo để căn, phóng to thu nhỏ), rồi gửi qua Zalo, Messenger, Facebook bằng bảng chia sẻ của máy hoặc lưu ảnh 1080 x 1350 vào máy.
 
+## Xem thử trên web
+
+https://thanhnamtandan.github.io/thiep-xuan/ (mở được trên điện thoại). Bản web dùng lời chúc soạn sẵn vì chưa có máy chủ AI chạy công khai. Mỗi lần code mới vào nhánh `main`, GitHub Actions tự build và đăng lại.
+
 ## Cấu trúc
 
 ```

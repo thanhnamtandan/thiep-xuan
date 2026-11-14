@@ -1,0 +1,42 @@
+# Mỗi lần có code mới trên main: build bản web của app và đăng lên GitHub Pages
+# (nhánh gh-pages), địa chỉ https://thanhnamtandan.github.io/thiep-xuan/
+name: Đăng bản web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      # Chưa đặt EXPO_PUBLIC_API_URL nên bản web dùng lời chúc soạn sẵn, không gọi AI.
+      - run: npx expo export --platform web --output-dir dist
+        env:
+          CI: "1"
+          EXPO_BASE_URL: /thiep-xuan
+      - run: touch dist/.nojekyll
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: mobile/dist
+          publish_branch: gh-pages

@@ -1,8 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { OFFLINE_RESPONSE, type GreetingForm, type GreetingResponse } from "./data";
+import type { GreetingForm, GreetingResponse } from "./data";
+import { libraryGreetings } from "./library";
 
 // Đặt EXPO_PUBLIC_API_URL trong file .env (ví dụ http://192.168.1.10:8787 khi chạy thử trên điện thoại).
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8787";
+// Không đặt thì app dùng lời chúc soạn sẵn, không gọi AI (bản web xem thử chạy theo cách này).
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 let deviceId: string | null = null;
 
@@ -19,7 +21,8 @@ async function getDeviceId(): Promise<string> {
   return (deviceId = fresh);
 }
 
-export async function fetchGreetings(form: GreetingForm): Promise<GreetingResponse> {
+export async function fetchGreetings(form: GreetingForm, again = false): Promise<GreetingResponse> {
+  if (!API_URL) return { ...libraryGreetings(form, again), source: "library", remaining: null };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 30000);
   try {
@@ -33,7 +36,7 @@ export async function fetchGreetings(form: GreetingForm): Promise<GreetingRespon
     return (await res.json()) as GreetingResponse;
   } catch (err) {
     console.warn("fetchGreetings failed, using offline greetings", err);
-    return OFFLINE_RESPONSE;
+    return { ...libraryGreetings(form, again), source: "offline", remaining: null };
   } finally {
     clearTimeout(timer);
   }

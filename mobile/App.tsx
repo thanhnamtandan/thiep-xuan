@@ -31,11 +31,13 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState<CardPhoto | null>(null);
 
-  const generate = async (f: GreetingForm) => {
+  const generate = async (f: GreetingForm, again = false) => {
     setForm(f);
     setLoading(true);
+    // "Viết lại": nhắc AI viết khác, nhưng không lưu câu nhắc này vào form.
+    const req = again ? { ...f, note: f.note ? `${f.note} (viết khác lần trước)` : "Viết khác lần trước" } : f;
     try {
-      setStep({ name: "pick", data: await fetchGreetings(f) });
+      setStep({ name: "pick", data: await fetchGreetings(req, again) });
     } finally {
       setLoading(false);
     }
@@ -52,14 +54,14 @@ export default function App() {
   return (
     <SafeAreaView style={s.root}>
       <StatusBar style="dark" />
-      {step.name === "form" && <FormScreen initial={form} loading={loading} onSubmit={generate} />}
+      {step.name === "form" && <FormScreen initial={form} loading={loading} onSubmit={(f) => generate(f)} />}
       {step.name === "pick" && (
         <PickScreen
           key={step.data.greetings.join("|")}
           data={step.data}
           loading={loading}
           onBack={() => setStep({ name: "form" })}
-          onRegenerate={() => generate({ ...form, note: form.note ? `${form.note} (viết khác lần trước)` : "Viết khác lần trước" })}
+          onRegenerate={() => generate(form, true)}
           onChoose={(greeting) => setStep({ name: "card", data: step.data, greeting })}
         />
       )}
